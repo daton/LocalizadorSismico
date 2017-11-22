@@ -48,7 +48,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(19.556665,-99.0228007)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.zoomTo(14.0f))
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(3.5f))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
       //  val tarea=TareaSismos()
        // tarea.execute(null,null,null);
