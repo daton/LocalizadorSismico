@@ -18,11 +18,17 @@ import org.springframework.web.client.RestTemplate
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
+  public  var sismito:Sismo?=null
 
     override fun onStart() {
         super.onStart()
         TareaSismos().execute()
+
+
     }
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +37,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+
+
     }
 
     /**
@@ -47,13 +56,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(19.556665,-99.0228007)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        mMap.addMarker(MarkerOptions().position(sydney).title("UNITEC, Ecatepec"))
         mMap.moveCamera(CameraUpdateFactory.zoomTo(3.5f))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
       //  val tarea=TareaSismos()
        // tarea.execute(null,null,null);
+
+
     }
-    internal class TareaSismos : AsyncTask<Void, Void, Sismo>() {
+    inner  class TareaSismos : AsyncTask<Void, Void, Sismo>() {
 
         override fun doInBackground(vararg params: Void): Sismo? {
             try {
@@ -62,18 +73,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
                 var sismo=restTemplate.getForObject(url, Sismo::class.java)
                 println("DESPUES DE REST:"+sismo.type)
+
+                sismito=sismo;
                 return sismo
             } catch (e: Exception) {
                 Log.e("ALGO MALOOOOO", e.message, e)
             }
-
             return null
         }
 
-        override fun onPostExecute(sismo: Sismo?) {
+
+
+         override fun onPostExecute(sismo: Sismo?) {
 
             println("Magnitud del primer sismo:"+sismo?.features?.get(0)?.properties?.mag);
+          //   Toast.makeText(applicationContext,"Magnitud "+sismito?.features?.get(0)?.properties?.mag, Toast.LENGTH_LONG).show()
+             val lat=sismo?.features?.get(0)?.geometry?.coordinates?.get(1);
+             val lon=sismo?.features?.get(0)?.geometry?.coordinates?.get(0);
+             val sydney = LatLng(lat!!, lon!!)
 
+             mMap.addMarker(MarkerOptions().position(sydney).title("Magnitud:"+sismito?.features?.get(0)?.properties?.mag))
+             Toast.makeText(applicationContext,"Sismos en este día: "+sismito?.metadata?.count,Toast.LENGTH_LONG ).show()
 
         }
     }

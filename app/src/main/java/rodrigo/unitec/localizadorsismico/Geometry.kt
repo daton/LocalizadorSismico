@@ -6,5 +6,5 @@ package rodrigo.unitec.localizadorsismico
 
 class Geometry {
    var type: String? = null
-   var coordinates = FloatArray(3)
+   var coordinates = DoubleArray(3)
 }
