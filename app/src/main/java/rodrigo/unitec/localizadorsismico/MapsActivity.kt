@@ -88,6 +88,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
 
         TareaSismos().execute()
         mGoogleApiClient?.connect();
+        TareaClima().execute();
 
 
     }
@@ -199,6 +200,46 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
 
              mMap.addMarker(MarkerOptions().position(sydney).title("Magnitud:"+sismito?.features?.get(0)?.properties?.mag))
              Toast.makeText(applicationContext,"Sismos en este día: "+sismito?.metadata?.count,Toast.LENGTH_LONG ).show()
+
+        }
+    }
+
+    inner  class TareaClima : AsyncTask<Void, Void, Sismo>() {
+
+        override fun doInBackground(vararg params: Void): Sismo? {
+            try {
+                val url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2017-11-27&endtime=2017-11-28&minlatitude=10&minlongitude=-120&maxlatitude=90&maxlongitude=90"
+                val restTemplate = RestTemplate()
+                restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
+                var sismo=restTemplate.getForObject(url, Sismo::class.java)
+                println("DESPUES DE REST:"+sismo.type)
+
+
+                var url2="http://api.openweathermap.org/data/2.5/weather?lat="+mLastLocation?.latitude+"&lon="+mLastLocation?.longitude+"&APPID=807b993a5243387b613f8c3038571e74"
+                restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
+
+
+
+                sismito=sismo;
+                return sismo
+            } catch (e: Exception) {
+                Log.e("ALGO MALOOOOO", e.message, e)
+            }
+            return null
+        }
+
+
+
+        override fun onPostExecute(sismo: Sismo?) {
+
+            println("Magnitud del primer sismo:"+sismo?.features?.get(0)?.properties?.mag);
+            //   Toast.makeText(applicationContext,"Magnitud "+sismito?.features?.get(0)?.properties?.mag, Toast.LENGTH_LONG).show()
+            val lat=sismo?.features?.get(0)?.geometry?.coordinates?.get(1);
+            val lon=sismo?.features?.get(0)?.geometry?.coordinates?.get(0);
+            val sydney = LatLng(lat!!, lon!!)
+
+            mMap.addMarker(MarkerOptions().position(sydney).title("Magnitud:"+sismito?.features?.get(0)?.properties?.mag))
+            Toast.makeText(applicationContext,"Sismos en este día: "+sismito?.metadata?.count,Toast.LENGTH_LONG ).show()
 
         }
     }
