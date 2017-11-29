@@ -43,6 +43,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
 
     protected var mLatitudeLabel: String? = null
     protected var mLongitudeLabel: String? = null
+    private lateinit var mMap: GoogleMap
+    public  var sismito:Sismo?=null
+
 
     @SuppressLint("MissingPermission")
     override fun onConnected(p0: Bundle?) {
@@ -56,7 +59,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
             val sydney = LatLng(mLastLocation?.getLatitude()!!, mLastLocation?.getLongitude()!!)
 
             mMap.addMarker(MarkerOptions().position(sydney).title("Latitud:" + mLastLocation?.getLatitude() + " Long:" + mLastLocation?.getLongitude()))
-            mMap.moveCamera(CameraUpdateFactory.zoomTo(18f))
+            mMap.moveCamera(CameraUpdateFactory.zoomTo(14f))
             mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
         } else {
             Toast.makeText(this, "Localizacion no detectada", Toast.LENGTH_LONG).show()
@@ -68,12 +71,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
         mGoogleApiClient?.connect();
     }
 
+
+
+
+
+
     override fun onConnectionFailed(p0: ConnectionResult) {
         print( "La conexion falló: el error es  = " + p0.getErrorCode());
     }
 
-    private lateinit var mMap: GoogleMap
-  public  var sismito:Sismo?=null
+
+
 
     override fun onStart() {
         super.onStart()
@@ -159,11 +167,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
 
         override fun doInBackground(vararg params: Void): Sismo? {
             try {
-                val url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2017-11-21&endtime=2017-11-22&minlatitude=10&minlongitude=-120&maxlatitude=90&maxlongitude=90"
+                val url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2017-11-27&endtime=2017-11-28&minlatitude=10&minlongitude=-120&maxlatitude=90&maxlongitude=90"
                 val restTemplate = RestTemplate()
                 restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
                 var sismo=restTemplate.getForObject(url, Sismo::class.java)
                 println("DESPUES DE REST:"+sismo.type)
+
+
+                var url2="http://api.openweathermap.org/data/2.5/weather?lat="+mLastLocation?.latitude+"&lon="+mLastLocation?.longitude+"&APPID=807b993a5243387b613f8c3038571e74"
+                restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
+
+
 
                 sismito=sismo;
                 return sismo

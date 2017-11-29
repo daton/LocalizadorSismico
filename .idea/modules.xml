@@ -3,8 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/LocalizadorSismico.iml" filepath="$PROJECT_DIR$/LocalizadorSismico.iml" />
+      <module fileurl="file://C:\Users\rapid\AndroidStudioProjects\LocalizadorSismico\LocalizadorSismico.iml" filepath="C:\Users\rapid\AndroidStudioProjects\LocalizadorSismico\LocalizadorSismico.iml" />
       <module fileurl="file://F:\AndroidStudioProjects\LocalizadorSismico\LocalizadorSismico.iml" filepath="F:\AndroidStudioProjects\LocalizadorSismico\LocalizadorSismico.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\rapid\AndroidStudioProjects\LocalizadorSismico\app\app.iml" filepath="C:\Users\rapid\AndroidStudioProjects\LocalizadorSismico\app\app.iml" />
       <module fileurl="file://F:\AndroidStudioProjects\LocalizadorSismico\app\app.iml" filepath="F:\AndroidStudioProjects\LocalizadorSismico\app\app.iml" />
     </modules>
   </component>
