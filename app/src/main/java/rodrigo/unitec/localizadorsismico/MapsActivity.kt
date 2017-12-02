@@ -27,7 +27,8 @@ import android.location.LocationManager
 import android.net.Uri
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
-
+import android.provider.Settings.Secure;
+import java.security.AccessController.getContext
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -108,6 +109,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
         buildGoogleApiClient();
 
 
+        val android_id = Settings.Secure.getString(applicationContext.contentResolver,
+                Settings.Secure.ANDROID_ID)
+
+        Toast.makeText(applicationContext,android_id,Toast.LENGTH_LONG).show();
+
+
 
 
 
@@ -150,7 +157,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
 
       //  val tarea=TareaSismos()
        // tarea.execute(null,null,null);
-
+        mMap!!.setOnMapClickListener { arg0 ->
+            // TODO Auto-generated method stub
+            Toast.makeText(applicationContext,"lat  "+ arg0.latitude.toString() + " lon " + arg0.longitude, Toast.LENGTH_LONG).show()
+        }
 
     }
 
