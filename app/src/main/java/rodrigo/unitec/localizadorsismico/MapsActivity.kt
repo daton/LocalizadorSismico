@@ -116,8 +116,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         buildGoogleApiClient();
+/******************************************************************************************************************************
+  ESte es el id de android que es unico para cada celular!!
 
-
+**********************************************************************************************************************************/
         val android_id = Settings.Secure.getString(applicationContext.contentResolver,
                 Settings.Secure.ANDROID_ID)
 
@@ -167,7 +169,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
       //  val tarea=TareaSismos()
        // tarea.execute(null,null,null);
         mMap!!.setOnMapClickListener { arg0 ->
-            // TODO Auto-generated method stub
+            // aqui iria  la conexion a la base de datos junto con el numero de id del celular
             Toast.makeText(applicationContext,"lat  "+ arg0.latitude.toString() + " lon " + arg0.longitude, Toast.LENGTH_LONG).show()
         }
 
