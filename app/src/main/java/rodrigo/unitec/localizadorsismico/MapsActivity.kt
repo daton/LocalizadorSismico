@@ -56,6 +56,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     public  var sismito:Sismo?=null
     public var climita:Clima?=null;
+    var temper:Float?=null;
 
 
 
@@ -234,7 +235,7 @@ lati= arg0.latitude
 
             //Caja
             val dlgAlert = AlertDialog.Builder(this)
-            dlgAlert.setMessage("Quieres guardar esta estacion meteorológica que has cliqueado!!")
+            dlgAlert.setMessage("Temperatura de esta zona:"+temper+". Quieres guardar esta estacion meteorológica que has cliqueado?")
             dlgAlert.setTitle("Guardar localizacion")
             dlgAlert.setPositiveButton("Guardar", null)
             dlgAlert.setCancelable(true)
@@ -325,7 +326,7 @@ lati= arg0.latitude
            //aqui van datos de longgitud val lat=clima?.features?.get(0)?.geometry?.coordinates?.get(1);
            //aqui van datos latitud val lon=clima?.features?.get(0)?.geometry?.coordinates?.get(0);
 
-var temper=climita?.main?.temp;
+ temper=climita?.main?.temp;
             temper=temper?.minus(273);
             //mMap.addMarker(MarkerOptions().position(sydney).title("Magnitud:"+sismito?.features?.get(0)?.properties?.mag))
             Toast.makeText(applicationContext,"Estacion mas cercana esta en: "+climita?.name+ " Temperatura "+temper,Toast.LENGTH_LONG).show()
