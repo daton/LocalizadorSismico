@@ -5,6 +5,6 @@ package rodrigo.unitec.localizadorsismico
  */
 
 class Coord {
-    internal var lon: Float? = null
-    internal var lat: Float? = null
+     var lon: Float? = null
+    var lat: Float? = null
 }

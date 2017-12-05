@@ -5,6 +5,6 @@ package rodrigo.unitec.localizadorsismico
  */
 
 class Wind {
-    internal var speed: Float? = null
-    internal var deg = 0
+    var speed: Float? = null
+     var deg = 0
 }

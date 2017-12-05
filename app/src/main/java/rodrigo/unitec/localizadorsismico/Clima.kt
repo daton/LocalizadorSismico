@@ -10,6 +10,7 @@ class Clima {
     var weather: Array<Weather>? = null
     var base: String? = null
     var main: Main? = null
+    var visibility:String?=null
     var wind: Wind?=null
     var clouds:Clouds?=null
     var dt:Int?=null

@@ -1,5 +1,6 @@
 package rodrigo.unitec.localizadorsismico
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.AsyncTask
@@ -23,15 +24,20 @@ import android.R.string.cancel
 import android.content.DialogInterface
 import android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.Uri
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
 import android.provider.Settings.Secure;
+import android.support.annotation.NonNull
+import android.support.v4.app.ActivityCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import java.security.AccessController.getContext
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     /**
      * El siguiente provee el punto de entrada para google play services
@@ -41,69 +47,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
      * Representa una localizacion geografica.
      */
     protected var mLastLocation: Location? = null
+  var lati:Double?=null;
+    var longi:Double?=null;
+    private var mFusedLocationClient: FusedLocationProviderClient? = null
 
     protected var mLatitudeLabel: String? = null
     protected var mLongitudeLabel: String? = null
     private lateinit var mMap: GoogleMap
     public  var sismito:Sismo?=null
+    public var climita:Clima?=null;
 
 
+
+
+
+    private val REQUEST_PERMISSIONS_REQUEST_CODE = 34
     @SuppressLint("MissingPermission")
-    override fun onConnected(p0: Bundle?) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient)
-        if (mLastLocation != null) {
-            Toast.makeText(this,
-                    "latitud:" + mLastLocation?.getLatitude(), Toast.LENGTH_LONG).show()
-            Toast.makeText(this, "Longitud" + mLastLocation?.getLongitude(), Toast.LENGTH_LONG).show()
-
-            // Add a marker in Sydney and move the camera
-            val sydney = LatLng(mLastLocation?.getLatitude()!!, mLastLocation?.getLongitude()!!)
-
-            mMap.addMarker(MarkerOptions().position(sydney).title("Latitud:" + mLastLocation?.getLatitude() + " Long:" + mLastLocation?.getLongitude()))
-            mMap.moveCamera(CameraUpdateFactory.zoomTo(14f))
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-        } else {
-            Toast.makeText(this, "Localizacion no detectada", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    override fun onConnectionSuspended(p0: Int) {
-        print("Connecccion suspendida");
-        mGoogleApiClient?.connect();
-    }
-
-
-
-
-
-
-    override fun onConnectionFailed(p0: ConnectionResult) {
-        print( "La conexion falló: el error es  = " + p0.getErrorCode());
-    }
-
-
-
-
-    override fun onStart() {
-        super.onStart()
-
-        TareaSismos().execute()
-        mGoogleApiClient?.connect();
-        TareaClima().execute();
-
-
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if (mGoogleApiClient?.isConnected()!!) {
-            mGoogleApiClient?.disconnect()!!
-        }
-    }
-
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
@@ -111,11 +70,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
 
 
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        buildGoogleApiClient();
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        mFusedLocationClient?.getLastLocation()
+                ?.addOnSuccessListener(this) { location ->
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+                        // Logic to handle location object
+                        Toast.makeText(applicationContext,"Localización "+location.latitude, Toast.LENGTH_LONG).show();
+
+                        val aqui = LatLng(location.latitude, location.longitude)
+                        mMap.addMarker(MarkerOptions().position(aqui).title("Aqui estas"))
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(aqui))
+                        mMap.moveCamera(CameraUpdateFactory.zoomTo(16f))
+
+                    }
+                }
 /******************************************************************************************************************************
   ESte es el id de android que es unico para cada celular!!
 
@@ -132,18 +106,95 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
     }
 
 
+    public override fun onStart() {
+        super.onStart()
 
-    @Synchronized
-    fun buildGoogleApiClient() {
-        mGoogleApiClient = GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build()
-
-
-
+        if (!checkPermissions()) {
+            requestPermissions()
+        } else {
+            getLastLocation()
+        }
     }
+
+
+    @SuppressWarnings("MissingPermission")
+    private fun  getLastLocation(){
+        mFusedLocationClient?.lastLocation?.addOnCompleteListener(OnCompleteListener<Location> {
+            @Override fun onComplete(@NonNull task: Task<Location>){
+                if(task.isSuccessful && task.result!=null){
+                    mLastLocation=task.result;
+                    Toast.makeText(applicationContext,"la ultima localización es "+mLastLocation?.latitude, Toast.LENGTH_LONG).show();
+                }
+            }
+        })
+    }
+
+
+    /**
+     * Return the current state of the permissions needed.
+     */
+    private fun checkPermissions(): Boolean {
+        val permissionState = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+        return permissionState == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun startLocationPermissionRequest() {
+        ActivityCompat.requestPermissions(this@MapsActivity,
+                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+                REQUEST_PERMISSIONS_REQUEST_CODE)
+    }
+
+    private fun requestPermissions() {
+        val shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+
+        // Provide an additional rationale to the user. This would happen if the user denied the
+        // request previously, but didn't check the "Don't ask again" checkbox.
+        if (shouldProvideRationale) {
+
+
+
+
+        } else {
+
+            startLocationPermissionRequest()
+        }
+    }
+
+    /**
+     * Callback received when a permissions request has been completed.
+     */
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                            grantResults: IntArray) {
+
+        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
+            if (grantResults.size <= 0) {
+                // If user interaction was interrupted, the permission request is cancelled and you
+                // receive empty arrays.
+
+            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted.
+                getLastLocation()
+            } else {
+                // Permission denied.
+
+                // Notify the user via a SnackBar that they have rejected a core permission for the
+                // app, which makes the Activity useless. In a real app, core permissions would
+                // typically be best requested during a welcome-screen flow.
+
+                // Additionally, it is important to remember that a permission might have been
+                // rejected without asking the user for permission (device policy or "Never ask
+                // again" prompts). Therefore, a user interface affordance is typically implemented
+                // when permissions are denied. Otherwise, your app could appear unresponsive to
+                // touches or interactions which have required permissions.
+
+            }
+        }
+    }
+
+
+
 
     /**
      * Manipulates the map once available.
@@ -169,11 +220,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
       //  val tarea=TareaSismos()
        // tarea.execute(null,null,null);
         mMap!!.setOnMapClickListener { arg0 ->
-            // aqui iria  la conexion a la base de datos junto con el numero de id del celular
-            Toast.makeText(applicationContext,"lat  "+ arg0.latitude.toString() + " lon " + arg0.longitude, Toast.LENGTH_LONG).show()
+
+
+                // aqui iria  la conexion a la base de datos junto con el numero de id del celular
+                Toast.makeText(applicationContext, "lat  " + arg0.latitude.toString() + " lon " + arg0.longitude, Toast.LENGTH_LONG).show()
+lati= arg0.latitude
+                longi = arg0.longitude
+
+            println("COMO VARIABLE LOCAL "+     lati);
+
+
+                TareaClima().execute(null, null, null)
+
+
+
         }
 
+
     }
+
 
 
     inner  class TareaSismos : AsyncTask<Void, Void, Sismo>() {
@@ -218,18 +283,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
 
     inner  class TareaClima : AsyncTask<Void, Void, Clima>() {
 
+
         override fun doInBackground(vararg params: Void): Clima? {
             try {
-                var url2="http://api.openweathermap.org/data/2.5/weather?lat="+mLastLocation?.latitude+"&lon="+mLastLocation?.longitude+"&APPID=807b993a5243387b613f8c3038571e74"
+
+
+
+                var url2="http://api.openweathermap.org/data/2.5/weather?lat="+ lati+"&lon="+longi+"&APPID=807b993a5243387b613f8c3038571e74"
                 val restTemplate = RestTemplate()
                 restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
                 var clima=restTemplate.getForObject(url2, Clima::class.java)
-                println("DESPUES DE REST:"+clima.type)
+                println("DESPUES DE REST:"+clima.id)
 
 
 
                 restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
-
 
 
                 climita=clima;
@@ -244,14 +312,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,GoogleApiClient.Con
 
         override fun onPostExecute(clima: Clima?) {
 
-            println("Magnitud del primer sismo:"+clima?.features?.get(0)?.properties?.mag);
+            println("Estacion mas cercana :"+clima?.name);
             //   Toast.makeText(applicationContext,"Magnitud "+sismito?.features?.get(0)?.properties?.mag, Toast.LENGTH_LONG).show()
            //aqui van datos de longgitud val lat=clima?.features?.get(0)?.geometry?.coordinates?.get(1);
            //aqui van datos latitud val lon=clima?.features?.get(0)?.geometry?.coordinates?.get(0);
-            val sydney = LatLng(lat!!, lon!!)
 
-            mMap.addMarker(MarkerOptions().position(sydney).title("Magnitud:"+sismito?.features?.get(0)?.properties?.mag))
-            Toast.makeText(applicationContext,"Sismos en este día: "+sismito?.metadata?.count,Toast.LENGTH_LONG ).show()
+var temper=climita?.main?.temp;
+            temper=temper?.minus(273);
+            //mMap.addMarker(MarkerOptions().position(sydney).title("Magnitud:"+sismito?.features?.get(0)?.properties?.mag))
+            Toast.makeText(applicationContext,"Estacion mas cercana esta en: "+climita?.name+ " Temperatura "+temper,Toast.LENGTH_LONG).show()
 
         }
     }

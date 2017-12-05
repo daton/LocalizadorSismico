@@ -5,11 +5,11 @@ package rodrigo.unitec.localizadorsismico
  */
 
 class Main {
-    internal var temp: Float? = null
-    internal var pressure: Float? = null
-    internal var humidity: Int? = null
-    internal var temp_min: Float? = null
-    internal var temp_max: Float? = null
-    internal var sea_level: Float? = null
-    internal var grnd_level: Float? = null
+  var temp: Float? = null
+     var pressure: Float? = null
+  var humidity: Int? = null
+    var temp_min: Float? = null
+    var temp_max: Float? = null
+     var sea_level: Float? = null
+    var grnd_level: Float? = null
 }

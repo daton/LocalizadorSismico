@@ -5,8 +5,10 @@ package rodrigo.unitec.localizadorsismico
  */
 
 class Sys {
-    internal var message: Float? = null
-    internal var country: String? = null
-    internal var sunrise: Long? = null
-    internal var sunset: Long? = null
+    var type:Int=0;
+    var id :Int=0
+     var message: Float? = null
+    var country: String? = null
+    var sunrise: Long? = null
+     var sunset: Long? = null
 }
