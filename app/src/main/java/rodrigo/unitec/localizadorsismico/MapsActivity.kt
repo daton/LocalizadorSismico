@@ -232,6 +232,14 @@ lati= arg0.latitude
 
                 TareaClima().execute(null, null, null)
 
+            //Caja
+            val dlgAlert = AlertDialog.Builder(this)
+            dlgAlert.setMessage("Quieres guardar esta estacion meteorológica que has cliqueado!!")
+            dlgAlert.setTitle("Guardar localizacion")
+            dlgAlert.setPositiveButton("Guardar", null)
+            dlgAlert.setCancelable(true)
+            dlgAlert.create().show()
+
 
 
         }
