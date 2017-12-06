@@ -88,9 +88,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback  {
             // Toast.makeText(applicationContext,"La estacion se guardara",Toast.LENGTH_SHORT).show();
 
         }
+        builder.setView(R.layout.dialogo_inicio)
         builder.setTitle("Bienvenido!!!")
-        builder.setMessage("Para buscar una estación y ver el clima  navega sobre el mapa y toca la pantalla para indicar en donde quieres emepzar la busqueda de tu estacion" +
-                " más cerca")
+       // builder.setMessage("Para buscar una estación y ver el clima  navega sobre el mapa y toca la pantalla para indicar en donde quieres emepzar la busqueda de tu estacion" +
+         //       " más cerca")
         // Set other dialog properties
 
 
@@ -266,17 +267,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback  {
 
             val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.myDialog))
             // Add the buttons
-            builder.setPositiveButton("Si quiero!") { dialog, id ->
+            builder.setPositiveButton("SI quiero!") { dialog, id ->
                 //  Aqui se conetcta al servicio para guardar la estación: SErvico esta dado por la TareaClimaUsuario
                // Toast.makeText(applicationContext,"La estacion se guardara",Toast.LENGTH_SHORT).show();
-                 mEStacion=  mMap.addMarker(MarkerOptions().position(aqui).title("Estacion Elejida:"+climita?.name +" Temperatura:"+climita?.main?.temp))
+                 mEStacion=  mMap.addMarker(MarkerOptions().position(aqui).title("Estacion Elejida:"+climita?.name +" Temperatura:"+temper))
             }
-            builder.setNegativeButton("Cancelar") { dialog, id ->
+            builder.setNegativeButton("NO quiero") { dialog, id ->
                 //
                 Toast.makeText(applicationContext,"La estacion NO se guardara",Toast.LENGTH_SHORT).show();
             }
             builder.setTitle("ESTACION ENCONTRADA!!")
-            builder.setMessage("¿Quieres guadar esta estación?")
+            builder.setMessage("¿Quieres guardar esta estación?")
             // Set other dialog properties
 
 
