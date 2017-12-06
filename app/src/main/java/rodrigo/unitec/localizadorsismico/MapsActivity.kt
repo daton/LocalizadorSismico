@@ -32,12 +32,21 @@ import android.support.v7.app.AlertDialog
 import android.provider.Settings.Secure;
 import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
-import java.security.AccessController.getContext
+import android.view.ContextThemeWrapper
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+import java.util.ArrayList
+
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback  {
+
+   var mEStacion: Marker? = null
+
+
 
     /**
      * El siguiente provee el punto de entrada para google play services
@@ -47,28 +56,50 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      * Representa una localizacion geografica.
      */
     protected var mLastLocation: Location? = null
-  var lati:Double?=null;
-    var longi:Double?=null;
+    var lati: Double? = null;
+    var longi: Double? = null;
     private var mFusedLocationClient: FusedLocationProviderClient? = null
 
     protected var mLatitudeLabel: String? = null
     protected var mLongitudeLabel: String? = null
     private lateinit var mMap: GoogleMap
-    public  var sismito:Sismo?=null
-    public var climita:Clima?=null;
-    var temper:Float?=null;
-
-
-
+    public var sismito: Sismo? = null
+    public var climita: Clima? = null;
+    var temper: Float? = null;
 
 
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 34
+
+
+
+
+
+
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
+        //Dialogo de bienvenida
+        val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.myDialog2))
+        // Add the buttons
+        builder.setPositiveButton("Aceptar") { dialog, id ->
+            //  Aqui se conetcta al servicio para guardar la estación: SErvico esta dado por la TareaClimaUsuario
+            // Toast.makeText(applicationContext,"La estacion se guardara",Toast.LENGTH_SHORT).show();
 
+        }
+        builder.setTitle("Bienvenido!!!")
+        builder.setMessage("Para buscar una estación y ver el clima  navega sobre el mapa y toca la pantalla para indicar en donde quieres emepzar la busqueda de tu estacion" +
+                " más cerca")
+        // Set other dialog properties
+
+
+        // Create the AlertDialog
+        val dialog = builder.create()
+        dialog.show()
+
+
+        TareaClimaUsuario().execute(null,null,null);
 
 
         val mapFragment = supportFragmentManager
@@ -82,7 +113,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
                         // Logic to handle location object
-                        Toast.makeText(applicationContext,"Localización "+location.latitude, Toast.LENGTH_LONG).show();
+                        Toast.makeText(applicationContext, "Localización " + location.latitude, Toast.LENGTH_LONG).show();
 
                         val aqui = LatLng(location.latitude, location.longitude)
                         mMap.addMarker(MarkerOptions().position(aqui).title("Aqui estas"))
@@ -91,17 +122,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     }
                 }
-/******************************************************************************************************************************
-  ESte es el id de android que es unico para cada celular!!
+        /******************************************************************************************************************************
+        ESte es el id de android que es unico para cada celular!!
 
-**********************************************************************************************************************************/
+         **********************************************************************************************************************************/
         val android_id = Settings.Secure.getString(applicationContext.contentResolver,
                 Settings.Secure.ANDROID_ID)
 
-        Toast.makeText(applicationContext,android_id,Toast.LENGTH_LONG).show();
-
-
-
+        Toast.makeText(applicationContext, android_id, Toast.LENGTH_LONG).show();
 
 
     }
@@ -119,12 +147,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     @SuppressWarnings("MissingPermission")
-    private fun  getLastLocation(){
+    private fun getLastLocation() {
         mFusedLocationClient?.lastLocation?.addOnCompleteListener(OnCompleteListener<Location> {
-            @Override fun onComplete(@NonNull task: Task<Location>){
-                if(task.isSuccessful && task.result!=null){
-                    mLastLocation=task.result;
-                    Toast.makeText(applicationContext,"la ultima localización es "+mLastLocation?.latitude, Toast.LENGTH_LONG).show();
+            @Override
+            fun onComplete(@NonNull task: Task<Location>) {
+                if (task.isSuccessful && task.result != null) {
+                    mLastLocation = task.result;
+                    Toast.makeText(applicationContext, "la ultima localización es " + mLastLocation?.latitude, Toast.LENGTH_LONG).show();
                 }
             }
         })
@@ -153,8 +182,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Provide an additional rationale to the user. This would happen if the user denied the
         // request previously, but didn't check the "Don't ask again" checkbox.
         if (shouldProvideRationale) {
-
-
 
 
         } else {
@@ -195,8 +222,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -210,65 +235,105 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
-       // val sydney = LatLng(19.556665,-99.0228007)
-       // mMap.addMarker(MarkerOptions().position(sydney).title("UNITEC, Ecatepec"))
+        // val sydney = LatLng(19.556665,-99.0228007)
+        // mMap.addMarker(MarkerOptions().position(sydney).title("UNITEC, Ecatepec"))
 
         //Comentamos los dos siguientes renglones para que no compitan con el de obtener la geolocalización:
-      //  mMap.moveCamera(CameraUpdateFactory.zoomTo(3.5f))
-      //  mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //  mMap.moveCamera(CameraUpdateFactory.zoomTo(3.5f))
+        //  mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
 
-      //  val tarea=TareaSismos()
-       // tarea.execute(null,null,null);
+        //  val tarea=TareaSismos()
+        // tarea.execute(null,null,null);
         mMap!!.setOnMapClickListener { arg0 ->
 
 
-                // aqui iria  la conexion a la base de datos junto con el numero de id del celular
-                Toast.makeText(applicationContext, "lat  " + arg0.latitude.toString() + " lon " + arg0.longitude, Toast.LENGTH_LONG).show()
-                lati= arg0.latitude
-                longi = arg0.longitude
+            // aqui iria  la conexion a la base de datos junto con el numero de id del celular
+            Toast.makeText(applicationContext, "lat  " + arg0.latitude.toString() + " lon " + arg0.longitude, Toast.LENGTH_LONG).show()
+            lati = arg0.latitude
+            longi = arg0.longitude
 
 
 
 
-                TareaClima().execute(null, null, null)
+            TareaClima().execute(null, null, null)
 
-            //Caja
-
-
-                val dlgAlert = AlertDialog.Builder(this)
-                dlgAlert.setMessage("Temperatura de esta zona:" + temper + ". Quieres guardar esta estacion meteorológica que has cliqueado?")
-                dlgAlert.setTitle("Guardar localizacion")
-                dlgAlert.setPositiveButton("Guardar", null)
-                dlgAlert.setCancelable(true)
-                dlgAlert.create().show()
+            var aqui = LatLng(lati!!, longi!!)
 
 
+
+
+
+            val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.myDialog))
+            // Add the buttons
+            builder.setPositiveButton("Si quiero!") { dialog, id ->
+                //  Aqui se conetcta al servicio para guardar la estación: SErvico esta dado por la TareaClimaUsuario
+               // Toast.makeText(applicationContext,"La estacion se guardara",Toast.LENGTH_SHORT).show();
+                 mEStacion=  mMap.addMarker(MarkerOptions().position(aqui).title("Estacion Elejida:"+climita?.name +" Temperatura:"+climita?.main?.temp))
+            }
+            builder.setNegativeButton("Cancelar") { dialog, id ->
+                //
+                Toast.makeText(applicationContext,"La estacion NO se guardara",Toast.LENGTH_SHORT).show();
+            }
+            builder.setTitle("ESTACION ENCONTRADA!!")
+            builder.setMessage("¿Quieres guadar esta estación?")
+            // Set other dialog properties
+
+
+            // Create the AlertDialog
+            val dialog = builder.create()
+            dialog.show()
+
+
+
+
+
+//Caja
+/*
+    val dlgAlert = AlertDialog.Builder(this)
+    dlgAlert.setMessage("Temperatura de esta zona:" + lati+ ". Quieres guardar esta estacion meteorológica que has cliqueado?")
+    dlgAlert.setTitle("Guardar localizacion")
+    dlgAlert.setPositiveButton("Guardar", null)
+    dlgAlert.setCancelable(true)
+    dlgAlert.create().show()
+*/
 
         }
 
+       // mMap.setOnMarkerClickListener(this);
+
+
 
     }
+    /*
+    override fun onMarkerClick(p0: Marker?): Boolean {
+
+            if(  p0?.title.equals("Estacion Elejida")) {
+                Toast.makeText(applicationContext, "Estacion: "+climita?.name, Toast.LENGTH_LONG).show()
+            }
+
+        return false;
+    }*/
 
 
 
-    inner  class TareaSismos : AsyncTask<Void, Void, Sismo>() {
+    inner class TareaSismos : AsyncTask<Void, Void, Sismo>() {
 
         override fun doInBackground(vararg params: Void): Sismo? {
             try {
                 val url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2017-11-28&endtime=2017-11-29&minlatitude=10&minlongitude=-120&maxlatitude=90&maxlongitude=90"
                 val restTemplate = RestTemplate()
                 restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
-                var sismo=restTemplate.getForObject(url, Sismo::class.java)
-                println("DESPUES DE REST:"+sismo.type)
+                var sismo = restTemplate.getForObject(url, Sismo::class.java)
+                println("DESPUES DE REST:" + sismo.type)
 
 
-                var url2="http://api.openweathermap.org/data/2.5/weather?lat="+mLastLocation?.latitude+"&lon="+mLastLocation?.longitude+"&APPID=807b993a5243387b613f8c3038571e74"
+                var url2 = "http://api.openweathermap.org/data/2.5/weather?lat=" + mLastLocation?.latitude + "&lon=" + mLastLocation?.longitude + "&APPID=807b993a5243387b613f8c3038571e74"
                 restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
 
 
 
-                sismito=sismo;
+                sismito = sismo;
                 return sismo
             } catch (e: Exception) {
                 Log.e("ALGO MALOOOOO", e.message, e)
@@ -277,41 +342,43 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
 
+        override fun onPostExecute(sismo: Sismo?) {
 
-         override fun onPostExecute(sismo: Sismo?) {
+            println("Magnitud del primer sismo:" + sismo?.features?.get(0)?.properties?.mag);
+            //   Toast.makeText(applicationContext,"Magnitud "+sismito?.features?.get(0)?.properties?.mag, Toast.LENGTH_LONG).show()
+            val lat = sismo?.features?.get(0)?.geometry?.coordinates?.get(1);
+            val lon = sismo?.features?.get(0)?.geometry?.coordinates?.get(0);
+            val sydney = LatLng(lat!!, lon!!)
 
-            println("Magnitud del primer sismo:"+sismo?.features?.get(0)?.properties?.mag);
-          //   Toast.makeText(applicationContext,"Magnitud "+sismito?.features?.get(0)?.properties?.mag, Toast.LENGTH_LONG).show()
-             val lat=sismo?.features?.get(0)?.geometry?.coordinates?.get(1);
-             val lon=sismo?.features?.get(0)?.geometry?.coordinates?.get(0);
-             val sydney = LatLng(lat!!, lon!!)
-
-             mMap.addMarker(MarkerOptions().position(sydney).title("Magnitud:"+sismito?.features?.get(0)?.properties?.mag))
-             Toast.makeText(applicationContext,"Sismos en este día: "+sismito?.metadata?.count,Toast.LENGTH_LONG ).show()
+            mMap.addMarker(MarkerOptions().position(sydney).title("Magnitud:" + sismito?.features?.get(0)?.properties?.mag))
+            Toast.makeText(applicationContext, "Sismos en este día: " + sismito?.metadata?.count, Toast.LENGTH_LONG).show()
 
         }
+
+
+
     }
 
-    inner  class TareaClima : AsyncTask<Void, Void, Clima>() {
+
+    inner class TareaClima : AsyncTask<Void, Void, Clima>() {
 
 
         override fun doInBackground(vararg params: Void): Clima? {
             try {
 
 
-
-                var url2="http://api.openweathermap.org/data/2.5/weather?lat="+ lati+"&lon="+longi+"&APPID=807b993a5243387b613f8c3038571e74"
+                var url2 = "http://api.openweathermap.org/data/2.5/weather?lat=" + lati + "&lon=" + longi + "&APPID=807b993a5243387b613f8c3038571e74"
                 val restTemplate = RestTemplate()
                 restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
-                var clima=restTemplate.getForObject(url2, Clima::class.java)
-                println("DESPUES DE REST:"+clima.id)
+                var clima = restTemplate.getForObject(url2, Clima::class.java)
+                println("DESPUES DE REST:" + clima.id)
 
 
 
                 restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
 
 
-                climita=clima;
+                climita = clima;
                 return clima
             } catch (e: Exception) {
                 Log.e("ALGO MALOOOOO clima", e.message, e)
@@ -320,59 +387,49 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
 
-
         override fun onPostExecute(clima: Clima?) {
 
-            println("Estacion mas cercana :"+clima?.name);
+            println("Estacion mas cercana :" + clima?.name);
             //   Toast.makeText(applicationContext,"Magnitud "+sismito?.features?.get(0)?.properties?.mag, Toast.LENGTH_LONG).show()
-           //aqui van datos de longgitud val lat=clima?.features?.get(0)?.geometry?.coordinates?.get(1);
-           //aqui van datos latitud val lon=clima?.features?.get(0)?.geometry?.coordinates?.get(0);
+            //aqui van datos de longgitud val lat=clima?.features?.get(0)?.geometry?.coordinates?.get(1);
+            //aqui van datos latitud val lon=clima?.features?.get(0)?.geometry?.coordinates?.get(0);
 
- temper=climita?.main?.temp;
-            temper=temper?.minus(273);
+            temper = climita?.main?.temp;
+            temper = temper?.minus(273);
             //mMap.addMarker(MarkerOptions().position(sydney).title("Magnitud:"+sismito?.features?.get(0)?.properties?.mag))
-            Toast.makeText(applicationContext,"Estacion mas cercana esta en: "+climita?.name+ " Temperatura "+temper,Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Estacion mas cercana esta en: " + climita?.name + " Temperatura " + temper, Toast.LENGTH_LONG).show()
 
         }
     }
 
-    inner  class TareaClimaUsuario : AsyncTask<Void, Void, Clima>() {
+    inner class TareaClimaUsuario : AsyncTask<Void, Void, Void>() {
 
-
-        override fun doInBackground(vararg params: Void): Clima? {
-            try {
-
-
-
-                var url2="https://tesis-unitec.herokuapp.com/api/clima"
-                val restTemplate = RestTemplate()
-                restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
-                var clima=restTemplate.getForObject(url2, Clima::class.java)
-                println("DESPUES DE REST:"+clima.id)
+        override fun doInBackground(vararg p0: Void?): Void? {
 
 
 
+            var url2="https://tesis-unitec.herokuapp.com/api/usuario"
+            val restTemplate = RestTemplate()
+            restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
+            var estring=restTemplate.getForObject(url2, String::class.java)
+            //   var maper: ObjectMapper = ObjectMapper();
 
-
-
-                climita=clima;
-                return clima
-            } catch (e: Exception) {
-                println("ALGO MALOOOOO en climausuario"+e.message)
-            }
-            return null
+            var usuarios = ArrayList<Usuario>()
+            val maper = ObjectMapper()
+            usuarios = maper.readValue(estring, object : TypeReference<ArrayList<Usuario>>() {})
+            println("DESPUES DE REST:"+usuarios.get(0).email);
+  return null
         }
 
+        override fun onPreExecute() {
+            super.onPreExecute()
+        }
 
-
-        override fun onPostExecute(clima: Clima?) {
+        override fun onPostExecute(result: Void?) {
+            super.onPostExecute(result)
 
 
         }
     }
-
-
-
-
 }
 
