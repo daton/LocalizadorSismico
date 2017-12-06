@@ -6,8 +6,8 @@ package rodrigo.unitec.localizadorsismico
 
 class Sismo {
      var type: String? = null
- var metadata: Metadata? = null
-var features: Array<Feature>? = null
+    var metadata: Metadata? = null
+    var features: Array<Feature>? = null
     var bbox:Array<Float>?=null;
 
 }

@@ -210,8 +210,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(19.556665,-99.0228007)
-        mMap.addMarker(MarkerOptions().position(sydney).title("UNITEC, Ecatepec"))
+       // val sydney = LatLng(19.556665,-99.0228007)
+       // mMap.addMarker(MarkerOptions().position(sydney).title("UNITEC, Ecatepec"))
 
         //Comentamos los dos siguientes renglones para que no compitan con el de obtener la geolocalización:
       //  mMap.moveCamera(CameraUpdateFactory.zoomTo(3.5f))
@@ -225,22 +225,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 // aqui iria  la conexion a la base de datos junto con el numero de id del celular
                 Toast.makeText(applicationContext, "lat  " + arg0.latitude.toString() + " lon " + arg0.longitude, Toast.LENGTH_LONG).show()
-lati= arg0.latitude
+                lati= arg0.latitude
                 longi = arg0.longitude
 
-            println("COMO VARIABLE LOCAL "+     lati);
+
 
 
                 TareaClima().execute(null, null, null)
 
             //Caja
-            val dlgAlert = AlertDialog.Builder(this)
-            dlgAlert.setMessage("Temperatura de esta zona:"+temper+". Quieres guardar esta estacion meteorológica que has cliqueado?")
-            dlgAlert.setTitle("Guardar localizacion")
-            dlgAlert.setPositiveButton("Guardar", null)
-            dlgAlert.setCancelable(true)
-            dlgAlert.create().show()
-
+            try {
+                Thread.sleep(2000)
+                val dlgAlert = AlertDialog.Builder(this)
+                dlgAlert.setMessage("Temperatura de esta zona:" + temper + ". Quieres guardar esta estacion meteorológica que has cliqueado?")
+                dlgAlert.setTitle("Guardar localizacion")
+                dlgAlert.setPositiveButton("Guardar", null)
+                dlgAlert.setCancelable(true)
+                dlgAlert.create().show()
+            }catch(e:InterruptedException){}
 
 
         }
@@ -254,7 +256,7 @@ lati= arg0.latitude
 
         override fun doInBackground(vararg params: Void): Sismo? {
             try {
-                val url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2017-11-27&endtime=2017-11-28&minlatitude=10&minlongitude=-120&maxlatitude=90&maxlongitude=90"
+                val url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2017-11-28&endtime=2017-11-29&minlatitude=10&minlongitude=-120&maxlatitude=90&maxlongitude=90"
                 val restTemplate = RestTemplate()
                 restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
                 var sismo=restTemplate.getForObject(url, Sismo::class.java)
@@ -333,6 +335,42 @@ lati= arg0.latitude
 
         }
     }
+
+    inner  class TareaClimaUsuario : AsyncTask<Void, Void, Clima>() {
+
+
+        override fun doInBackground(vararg params: Void): Clima? {
+            try {
+
+
+
+                var url2="https://tesis-unitec.herokuapp.com/api/clima"
+                val restTemplate = RestTemplate()
+                restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
+                var clima=restTemplate.getForObject(url2, Clima::class.java)
+                println("DESPUES DE REST:"+clima.id)
+
+
+
+
+
+
+                climita=clima;
+                return clima
+            } catch (e: Exception) {
+                println("ALGO MALOOOOO en climausuario"+e.message)
+            }
+            return null
+        }
+
+
+
+        override fun onPostExecute(clima: Clima?) {
+
+
+        }
+    }
+
 
 
 
