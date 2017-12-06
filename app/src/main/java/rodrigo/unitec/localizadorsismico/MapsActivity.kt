@@ -234,15 +234,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 TareaClima().execute(null, null, null)
 
             //Caja
-            try {
-                Thread.sleep(2000)
+
+
                 val dlgAlert = AlertDialog.Builder(this)
                 dlgAlert.setMessage("Temperatura de esta zona:" + temper + ". Quieres guardar esta estacion meteorológica que has cliqueado?")
                 dlgAlert.setTitle("Guardar localizacion")
                 dlgAlert.setPositiveButton("Guardar", null)
                 dlgAlert.setCancelable(true)
                 dlgAlert.create().show()
-            }catch(e:InterruptedException){}
+
 
 
         }
