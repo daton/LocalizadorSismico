@@ -270,7 +270,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback  {
             builder.setPositiveButton("SI quiero!") { dialog, id ->
                 //  Aqui se conetcta al servicio para guardar la estación: SErvico esta dado por la TareaClimaUsuario
                // Toast.makeText(applicationContext,"La estacion se guardara",Toast.LENGTH_SHORT).show();
-                 mEStacion=  mMap.addMarker(MarkerOptions().position(aqui).title("Estacion Elejida:"+climita?.name +" Temperatura:"+temper))
+                 mEStacion=  mMap.addMarker(MarkerOptions().position(aqui).title("Estacion:"+climita?.name ).snippet("Temperatura:"+temper))
             }
             builder.setNegativeButton("NO quiero") { dialog, id ->
                 //
