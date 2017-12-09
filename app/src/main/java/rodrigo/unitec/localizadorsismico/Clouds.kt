@@ -5,5 +5,5 @@ package rodrigo.unitec.localizadorsismico
  */
 
 class Clouds {
-    var all = 0
+ var all:Int?=null
 }

@@ -5,13 +5,17 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+
+    defaultConfig {
+        multiDexEnabled true
+    }
     compileSdkVersion 26
     defaultConfig {
         applicationId "rodrigo.unitec.localizadorsismico"
         minSdkVersion 22
         targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        versionCode 5
+        versionName "5.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -38,7 +42,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.3.2'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation  'com.google.android.gms:play-services:11.6.0'
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.19.2"
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
