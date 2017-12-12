@@ -47,7 +47,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback  {
    var mEStacion: Marker? = null
 
 
-
+    var estatus = Estatus()
     /**
      * El siguiente provee el punto de entrada para google play services
      */
@@ -427,14 +427,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback  {
 
 
 
-         //  var url2="https://tesis-unitec.herokuapp.com/api/clima"
-            var url2="http://192.168.1.73:9010/api/clima"
+          var url2="https://tesis-unitec.herokuapp.com/api/clima"
+          //  var url2="http://192.168.1.73:9010/api/clima"
             val restTemplate = RestTemplate()
             restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
         //    var estring=restTemplate.postForObject(url2,climita, String::class.java)
             //   var maper: ObjectMapper = ObjectMapper();
 
-            var estatus = Estatus()
+
             val maper = ObjectMapper()
           //  usuarios = maper.readValue(estring, object : TypeReference<ArrayList<Usuario>>() {})
 
@@ -452,7 +452,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback  {
 
         override fun onPostExecute(result: Void?) {
             super.onPostExecute(result)
-   Toast.makeText(applicationContext,"Seguardo con exito", Toast.LENGTH_LONG).show();
+   Toast.makeText(applicationContext,estatus.mensaje, Toast.LENGTH_LONG).show();
 
         }
     }
