@@ -133,10 +133,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback  {
         ESte es el id de android que es unico para cada celular!!
 
          **********************************************************************************************************************************/
-        val android_id = Settings.Secure.getString(applicationContext.contentResolver,
-                Settings.Secure.ANDROID_ID)
+      //  val android_id = Settings.Secure.getString(applicationContext.contentResolver,
+       //         Settings.Secure.ANDROID_ID)
 
-        Toast.makeText(applicationContext, android_id, Toast.LENGTH_LONG).show();
+     //   Toast.makeText(applicationContext, android_id, Toast.LENGTH_LONG).show();
 
 
     }
